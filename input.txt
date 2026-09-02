@@ -1,0 +1,46 @@
+>>> echo $$
+17147
+
+
+>>> cat /proc/17147/status | head -n 15
+Name:   bash
+Umask:  0022
+State:  S (sleeping)
+Tgid:   17147
+Ngid:   0
+Pid:    17147
+PPid:   13361
+TracerPid:      0
+Uid:    1000    1000    1000    1000
+Gid:    1000    1000    1000    1000
+FDSize: 256
+Groups: 954 967 983 989 992 998 1000 
+NStgid: 17147
+NSpid:  17147
+NSpgid: 17147
+
+
+>>> cat /proc/17147/cmdline
+File: /proc/17147/cmdline   <BINARY>
+
+
+>>> tr '\0' ' ' < /proc/17147/cmdline
+/usr/bin/bash --init-file /usr/share/code/resources/app/out/vs/workbench/contrib/terminal/common/scripts/shellIntegration-bash.sh 
+
+
+>>> ls -l /proc/17147/fd
+lrwx------ - john  2 сен 14:44 0 -> /dev/pts/4
+lrwx------ - john  2 сен 14:44 1 -> /dev/pts/4
+lrwx------ - john  2 сен 14:44 2 -> /dev/pts/4
+lrwx------ - john  2 сен 14:44 50 -> socket:[334022]
+lrwx------ - john  2 сен 14:44 51 -> /dev/ptmx
+lr-x------ - john  2 сен 14:44 103 -> /usr/share/code/v8_context_snapshot.bin
+lrwx------ - john  2 сен 14:44 255 -> /dev/pts/4
+
+
+>>> 
+>>> 
+>>> 
+>>> 
+>>> 
+>>> 
