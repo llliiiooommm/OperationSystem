@@ -16,15 +16,6 @@ SOURCES := src/main.c src/args.c src/proc_info.c src/output.c
 # создает соответствующие объекты
 OBJECTS := build/main.o build/args.o build/proc_info.o build/output.o
 
-# берет объектные файлы и объединяет в одну программу
-$(TARGET): $(OBJECTS)
-	$(CC) $(OBJECTS) -o $(TARGET)
-
-# .c -> .o
-build/%.o: src/%.c include/args.h include/proc_info.h include/output.h
-	$(CC) $(CFLAGS) -c $< -o $@
-
-
 .PHONY: all
 
 all: $(TARGET)
