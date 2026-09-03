@@ -62,7 +62,15 @@ release: CFLAGS += -O2
 release: clean all
 
 # RUN
+# типа будет запускать программу на pid текущего шелла
 .PHONY: run
 
 run:
 	$(TARGET) $$
+
+
+# CLEAN
+.PHONY: clean
+
+clean:
+	rm -rf $(BUILD_DIR) $(BIN_DIR)
