@@ -53,3 +53,16 @@ debug: CFLAGS += -g -O0 $(SANITIZE_FLAGS)
 debug: LDFLAGS += $(SANITIZE_FLAGS)
 
 debug: clean all
+
+
+# RELEASE
+.PHONY: release
+# для релейза добавляем оптимизацию 
+release: CFLAGS += -O2
+release: clean all
+
+# RUN
+.PHONY: run
+
+run:
+	$(TARGET) $$
