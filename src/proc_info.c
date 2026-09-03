@@ -81,4 +81,100 @@ int process_info_read(ProcessInfo *info, unsigned int pid)
         return 1;
     }
 
+    // открывает status_path для чтения
+    FILE *file;
+    file = fopen(status_path, "r");
+
+    if (file == NULL)
+    {
+        return 1;
+    }
+
+    char line[256];
+
+    // флаги наличия обязательных полей
+    int name_found = 0;
+    int state_found = 0;
+    int pid_found = 0;
+    int ppid_found = 0;
+    // ================================================================
+    //                      STATUS
+    // ================================================================
+    // тип продолжаем читать пока fgets получает очередную строку
+    while (fgets(line, sizeof(line), file) != NULL)
+    {
+        if (strncmp(line, "Name:", 5) == 0)
+        {
+            // тип name занимает 5 символов так что после должно указываться
+            char *value = line + 5;
+
+            // пропуск пробелов и табуляций
+            while (*value == ' ' || *value == '\t')
+            {
+                value++;
+            }
+
+            // удаление перевода строки \n который fgets изначально оставил в конце
+            value[strcspn(value, "\n")] = '\0';
+
+            // копируется полученное имя в info->name и гарантируется, 
+            // что будет наличие завершающего '\0'
+            strncpy(info->name, value, sizeof(info->name) - 1);
+            info->name[sizeof(info->name) - 1] = '\0';
+
+            name_found = 1;
+        }
+
+        if (strncmp(line, "State:", 6) == 0)
+        {
+            // тип value занимает 6 символов так что после должно указываться
+            char *value = line + 6;
+
+            // пропуск пробелов и табуляций
+            while (*value == ' ' || *value == '\t')
+            {
+                value++;
+            }
+
+            // удаление перевода строки \n который fgets изначально оставил в конце
+            value[strcspn(value, "\n")] = '\0';
+
+            // копируется полученное состояние в info->state и гарантируется, 
+            // что будет наличие завершающего '\0'
+            strncpy(info->state, value, sizeof(info->state) - 1);
+            info->state[sizeof(info->state) - 1] = '\0';
+
+            state_found = 1;
+        }
+
+        // проверяет начинается ли текущая строка с pid
+        if (strncmp(line, "Pid:", 4) == 0)
+        {
+            // передает в strtoul часть строки после pid и преобразует текст в число
+            info->pid = (unsigned int)strtoul(line + 4, NULL, 10);
+            pid_found = 1;
+        }
+
+        // проверяет начинается ли текущая строка с Ppid
+        if (strncmp(line, "PPid:", 5) == 0)
+        {
+            // передает в strtoul часть строки после ppid и преобразует текст в число
+            info->parent_pid = (unsigned int)strtoul(line + 5, NULL, 10);
+            ppid_found = 1;
+        }
+    }
+
+    // если хотя бы один равен 0 значет обязательное полве в status не найдено
+    if (!name_found || !state_found || !pid_found || !ppid_found)
+    {
+        fclose(file);
+        return 1;
+    }
+
+    fclose(file);
+
+    // подготовка к 5 пункту
+    // ================================================================
+    //                      CMDLINE
+    // ================================================================
 }
