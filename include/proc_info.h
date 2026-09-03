@@ -19,4 +19,7 @@ void process_info_init(ProcessInfo *info);
 // функция осовобождения динамической памяти структуры
 void process_info_destroy(ProcessInfo *info);
 
+// интерфейс функции которую будет юзать main.c для получения инфы о процессе
+int process_info_read(ProcessInfo *info, unsigned int pid);
+
 #endif
