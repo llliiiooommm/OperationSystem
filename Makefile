@@ -1,66 +1,55 @@
-CC = clang
+CC := gcc
 
-# Стандарт C
-CFLAGS = -std=c17 -Wall -Wextra -Wpedantic -Werror
+# стандарт, основные предупреждения, дополнительные, 
+# нарушения стандарта, любое предупреждение - ошибка
+CFLAGS := -std=c17 -Wall -Wextra -Wpedantic -Werror
 
-# Режимы сборки
-DEBUG_FLAGS = -g -O0 $(CFLAGS)
-RELEASE_FLAGS = -O2 -DNDEBUG $(CFLAGS)
+# пути к уже существующим каталогам проекта 
+SRC_DIR := src
+BUILD_DIR := build
+BIN_DIR := bin
 
-# Санитайзеры для debug
-SANITIZE_FLAGS = -fsanitize=address,undefined -fno-omit-frame-pointer
+TARGET := $(BIN_DIR)/procview
 
-# Пути
-SRC_DIR = src
-INCLUDE_DIR = include
-BUILD_DIR = build
-BIN_DIR = bin
+# перечисляет все .c файлы
+SOURCES := src/main.c src/args.c src/proc_info.c src/output.c
+# создает соответствующие объекты
+OBJECTS := build/main.o build/args.o build/proc_info.o build/output.o
 
-# Объектные файлы
-OBJ = $(SRC_DIR)/args.o $(SRC_DIR)/main.o $(SRC_DIR)/output.o $(SRC_DIR)/proc_info.o
+# берет объектные файлы и объединяет в одну программу
+$(TARGET): $(OBJECTS)
+	$(CC) $(OBJECTS) -o $(TARGET)
 
-# Исполняемый файл
-TARGET = $(BIN_DIR)/procview
+# .c -> .o
+build/%.o: src/%.c include/args.h include/proc_info.h include/output.h
+	$(CC) $(CFLAGS) -c $< -o $@
 
-# ========================
-# Основная цель
-# ========================
+
+.PHONY: all
+
 all: $(TARGET)
 
-# ========================
-# Цели для отладки
-# ========================
-debug: CFLAGS += $(SANITIZE_FLAGS) $(DEBUG_FLAGS)
-debug: $(TARGET)
+# СОЗДАНИЕ ДИРЕКТОРИЙ
+# создаёт директорию bin
+$(TARGET): $(OBJECTS)
+	mkdir -p $(BIN_DIR)
+	$(CC) $(OBJECTS) -o $(TARGET)
 
-release: CFLAGS += $(RELEASE_FLAGS)
-release: $(TARGET)
+# создаёт директорию build
+build/%.o: src/%.c include/args.h include/proc_info.h include/output.h
+	mkdir -p $(BUILD_DIR)
+	$(CC) $(CFLAGS) -c $< -o $@
 
-# ========================
-# Запуск программы
-# ========================
-run: $(TARGET)
-	$(TARGET) $$
 
-# ========================
-# Очистка
-# ========================
-clean:
-	rm -rf $(BUILD_DIR) $(BIN_DIR)
+# ДЕБАГ
+# санитайзеры требуемые по заданию
+SANITIZE_FLAGS := -fsanitize=address,undefined -fno-omit-frame-pointer
 
-# ========================
-# Сборка исполняемого файла
-# ========================
-$(TARGET): $(OBJ)
-	@mkdir -p $(BIN_DIR)
-	$(CC) $(CFLAGS) -o $@ $^
+.PHONY: debug
 
-# ========================
-# Общие правила для .c файлов
-# ========================
-$(SRC_DIR)/%.o: $(SRC_DIR)/%.c
-	@mkdir -p $(BUILD_DIR)
-	$(CC) $(CFLAGS) -I$(INCLUDE_DIR) -c -o $@ $<
+# добавление для дебаг сборки отладочную информацию и отключение оптимизации
+debug: CFLAGS += -g -O0 $(SANITIZE_FLAGS)
+# Говорим чтобы санитайзеры были не только при компиляции но и при линковке
+debug: LDFLAGS += $(SANITIZE_FLAGS)
 
-# Объявляем цели как служебные
-.PHONY: all debug release run clean
+debug: clean all
