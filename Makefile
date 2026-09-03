@@ -29,11 +29,11 @@ build/%.o: src/%.c include/args.h include/proc_info.h include/output.h
 
 all: $(TARGET)
 
-# СОЗДАНИЕ ДИРЕКТОРИЙ
+# СОЗДАНИЕ ДИРЕКТОРИЙ (линковка)
 # создаёт директорию bin
 $(TARGET): $(OBJECTS)
 	mkdir -p $(BIN_DIR)
-	$(CC) $(OBJECTS) -o $(TARGET)
+	$(CC) $(OBJECTS) $(LDFLAGS) -o $(TARGET)
 
 # создаёт директорию build
 build/%.o: src/%.c include/args.h include/proc_info.h include/output.h
