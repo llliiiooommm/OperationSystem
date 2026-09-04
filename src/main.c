@@ -12,7 +12,7 @@ int main(int argc, char *argv[])
     if (argc != 2)
     {
         fprintf(stderr, "Usage: %s <PID>\n", argv[0]);
-        return 1;
+        return 2;
     }
 
     // работа с parse_pid
@@ -24,7 +24,7 @@ int main(int argc, char *argv[])
     if (parse_pid(argv[1], &pid) != 0)
     {
         fprintf(stderr, "Invalid PID: %s\n", argv[1]);
-        return 1;
+        return 2;
     }
 
     // создаём переменную структуры которая определена в proc_info.h

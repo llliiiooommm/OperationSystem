@@ -1,6 +1,31 @@
 #include "output.h"
 #include "stdio.h"
 
+// пришлось перекинуть так как make не разрешал (якобы не видел функцию т к вызывалась раньше)
+// для перевода буквенного кода состояния в русское полное описание
+static const char *state_description(char state)
+{
+    switch (state)
+    {
+        case 'R':
+            return "Выполняется или готов к выполнению";
+        case 'S':
+            return "Прерываемый сон, обычно ожидание события";
+        case 'D':
+            return "Непрерываемое ожидание, часто ожидание I/O";
+        case 'T':
+            return "Остановлен сигналом или трассировщиком";
+        case 't':
+            return "Остановлен отладчиком при трассировке";
+        case 'Z':
+            return "Zombie: процесс завершён, но ещё не собран родителем";
+        case 'I':
+            return "Idle: простаивающий поток ядра";
+        default:
+            return "Неизвестное состояние";
+    }
+}
+
 // ну реализация функции вывода
 void output_process_info(const ProcessInfo *info)
 {
@@ -29,28 +54,4 @@ void output_process_info(const ProcessInfo *info)
     // unsigned int
     printf("Open file descriptors: %u\n", info->fd_count);
 
-}
-
-// для перевода буквенного кода состояния в русское полное описание
-static const char *state_description(char state)
-{
-    switch (state)
-    {
-        case 'R':
-            return "Выполняется или готов к выполнению";
-        case 'S':
-            return "Прерываемый сон, обычно ожидание события";
-        case 'D':
-            return "Непрерываемое ожидание, часто ожидание I/O";
-        case 'T':
-            return "Остановлен сигналом или трассировщиком";
-        case 't':
-            return "Остановлен отладчиком при трассировке";
-        case 'Z':
-            return "Zombie: процесс завершён, но ещё не собран родителем";
-        case 'I':
-            return "Idle: простаивающий поток ядра";
-        default:
-            return "Неизвестное состояние";
-    }
 }

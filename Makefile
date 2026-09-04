@@ -1,8 +1,8 @@
 CC := gcc
 
 # стандарт, основные предупреждения, дополнительные, 
-# нарушения стандарта, любое предупреждение - ошибка
-CFLAGS := -std=c17 -Wall -Wextra -Wpedantic -Werror
+# нарушения стандарта, любое предупреждение - ошибка, добавлил заголовки т к ошибки были
+CFLAGS := -std=c17 -Wall -Wextra -Wpedantic -Werror -Iinclude
 
 # пути к уже существующим каталогам проекта 
 SRC_DIR := src
@@ -52,13 +52,7 @@ debug: clean all
 release: CFLAGS += -O2
 release: clean all
 
-# RUN
-# типа будет запускать программу на pid текущего шелла
-.PHONY: run
-
-run:
-	$(TARGET) $$
-
+#тут был RUN но я удалил т к незачем
 
 # CLEAN
 .PHONY: clean
