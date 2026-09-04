@@ -175,6 +175,16 @@ int process_info_read(ProcessInfo *info, unsigned int pid)
             ppid_found = 1;
         }
     }
+    // так как fgets возвращает null в двух случаях:
+    // 1) конец файла
+    // 2) ошибка чтения
+    // и тут проверка ошибки чтения status, тип ferror позволяет отличать 
+    // ошибку от нормального окончания файла
+    if (ferror(file))
+    {
+        fclose(file);
+        return 1;
+    }
 
     // если хотя бы один равен 0 значет обязательное полве в status не найдено
     if (!name_found || !state_found || !pid_found || !ppid_found)
