@@ -81,6 +81,10 @@ int process_info_read(ProcessInfo *info, unsigned int pid)
         return 1;
     }
 
+
+    // ================================================================
+    //                      STATUS
+    // ================================================================
     // открывает status_path для чтения
     FILE *file;
     file = fopen(status_path, "r");
@@ -97,9 +101,7 @@ int process_info_read(ProcessInfo *info, unsigned int pid)
     int state_found = 0;
     int pid_found = 0;
     int ppid_found = 0;
-    // ================================================================
-    //                      STATUS
-    // ================================================================
+
     // тип продолжаем читать пока fgets получает очередную строку
     while (fgets(line, sizeof(line), file) != NULL)
     {
@@ -173,8 +175,93 @@ int process_info_read(ProcessInfo *info, unsigned int pid)
 
     fclose(file);
 
+
+
     // подготовка к 5 пункту
     // ================================================================
     //                      CMDLINE
     // ================================================================
+    // открывает cmdline_path для чтения
+    file = fopen(cmdline_path, "rb");
+
+    if (file == NULL)
+    {
+        return 1;
+    }
+
+    // указатель на динамическую строку в которую собрать 
+    // надо командную строку процесса - начинается с null
+    char *command_line = NULL;
+    // хранит текущий размер выделенного буфера
+    size_t command_size = 0;
+
+    // далее будет считываться cmdline по байтово и 
+    // увеличиваться буфер если надо
+
+    // переменная хранящая очередной считанный байт
+    int character;
+
+    // читает по одному байту пока не достигнет конца файла
+    while ((character = fgetc(file)) != EOF)
+    {
+        // необходим временный указатель, так как если realloc не сможет
+        // выделить память то старый указатель command_line ещё понадобится для free 
+        char *new_command_line;
+
+        // т к command_line это динамический буфер, 
+        // а command_size это колво символов в command_line,
+        // то при первом символе необходимо место для 'символ' + '\0', 
+        // то есть command_size
+        new_command_line = realloc(command_line, command_size + 2);
+
+        // это проверка при ошибке выделения
+        if (new_command_line == NULL)
+        {
+            free(command_line);
+            fclose(file);
+            return 1;
+        }
+
+        command_line = new_command_line;
+
+        // если прочитал нулевой байт то ' '
+        if (character == '\0')
+        {
+            command_line[command_size] = ' ';
+        }
+        else
+        {
+            command_line[command_size] = (char)character;
+        }
+
+        // после добавления символа увеличивается колво записанных символов
+        command_size++;
+        // и в каждый момент оставляет строку с завершающим нулевым байтом '\0'
+        command_line[command_size] = '\0';
+    }
+
+    // важная информация - цикл завершается в двух случаях:
+    // 1) действительно достигнут конец файла
+    // 2) при чтении произошла ошибка
+    // ferror(file) ниже проверяет именно второй случай
+    // ну типа если ошибка произошла то освобождается уже выделенная память
+    if (ferror(file))
+    {
+        free(command_line);
+        fclose(file);
+        return 1;
+    }
+
+    // убираются лишние '\0' и послендний '\0' заменяется в пробел
+    if (command_size > 0 && command_line[command_size - 1] == ' ')
+    {
+        command_line[command_size - 1] = '\0';
+        command_size--;
+    }
+
+    // закрывается cmdline и передаётся собранная 
+    // динамическая строка в наш processinfo
+    fclose(file);
+    info->command_line = command_line;
+
 }
