@@ -9,8 +9,8 @@ void output_process_info(const ProcessInfo *info)
     printf("PID: %u\n", info->pid);
     // %s т к name строка
     printf("Name: %s\n", info->name);
-    // %s т к state строка
-    printf("State: %s\n", info->state);
+    // пробую юзнуть сразу на выводе перевод буквенного кода
+    printf("State: %c (%s)\n", info->state[0], state_description(info->state[0]));
     // %u т к parent_pid имеет тип unsigned int
     printf("Parent PID: %u\n", info->parent_pid);
 
@@ -31,3 +31,26 @@ void output_process_info(const ProcessInfo *info)
 
 }
 
+// для перевода буквенного кода состояния в русское полное описание
+static const char *state_description(char state)
+{
+    switch (state)
+    {
+        case 'R':
+            return "Выполняется или готов к выполнению";
+        case 'S':
+            return "Прерываемый сон, обычно ожидание события";
+        case 'D':
+            return "Непрерываемое ожидание, часто ожидание I/O";
+        case 'T':
+            return "Остановлен сигналом или трассировщиком";
+        case 't':
+            return "Остановлен отладчиком при трассировке";
+        case 'Z':
+            return "Zombie: процесс завершён, но ещё не собран родителем";
+        case 'I':
+            return "Idle: простаивающий поток ядра";
+        default:
+            return "Неизвестное состояние";
+    }
+}
