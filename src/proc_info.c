@@ -98,6 +98,9 @@ int process_info_read(ProcessInfo *info, unsigned int pid)
 
     if (file == NULL)
     {
+        // тип если не смог открыть каталог /proc/<pid>/status, 
+        // то выведет системную ошибку в stderr
+        perror(status_path);
         return 1;
     }
 
@@ -192,6 +195,9 @@ int process_info_read(ProcessInfo *info, unsigned int pid)
 
     if (file == NULL)
     {
+        // тип если не смог открыть /proc/<pid>/cmdline,
+        // то даст ошибку в stderr
+        perror(cmdline_path);
         return 1;
     }
 
@@ -284,6 +290,9 @@ int process_info_read(ProcessInfo *info, unsigned int pid)
     // проверка открыточти каталога - если не удалось то ошибка
     if (directory == NULL)
     {
+        // тип если не смог открыть /proc/<pid>/fd,
+        // то даст ошибку в stderr
+        perror(fd_path);
         return 1;
     }
 
