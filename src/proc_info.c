@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <dirent.h>
 #include <errno.h>
+#include <string.h>
 
 // буфер для хранения строки статуса командной строки и колво дестрипторов
 #define PATH_SIZE 64
@@ -17,6 +18,9 @@
 // так как функции opendir readdir closedir указано в задании
 
 // errno.h нужно для понимания была ли ошибка во время чтения каталога
+
+// string.h для strncmp(), strcspn(), strncpy(), strcmp()
+
 
 // безопасная инициализация всех полей структуры
 void process_info_init(ProcessInfo *info)
